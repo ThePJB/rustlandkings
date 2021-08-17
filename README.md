@@ -1,27 +1,5 @@
 rustland kings
 
-how to best do collision between terrain and dudes?
-
-currently its like
-
-list of entities
-simulate collisions
-compute movement
-apply movement
-
-so we could have entities -> terrain and rejoin at compute movement step
-
-we could join earlier by just having maybe object
-since it just uses the objects rect anyway
-
----------
-compute entity collisions with terrain
-    do a neighbourhood search around the entity then
-    if entity size < terrain grid size we can just look up the 3x3 area around the entity
-    then make collision events like the other function
-    then it should be taken care of in compute movement sort of thing
-
-fix terrain stitching
 
 shooting
 
@@ -38,23 +16,32 @@ terrain generation
 
 fix sliding along walls
 
-{
-    THING: 1.0
-    OTHER_THING: 2.0
-    asddfasdf: 4.12
-}[choice]
-
-
 ------------------
 
-ways in which terrian collision is broken:
-    - sometimes ur 1 away from a wall and it thinks u collide with it e.g. 1,0 when ur in 1,1
+ok changing <= to <  and vice versa mostly fixed it. if you are travelling diagonally you still hitch a bit
 
-    rarely as fuck does collision with the actual wall register
+stop vscode putting in helpful characters for me please
 
-    grid rects should be correct because it draws properly, but its as if they get moved and moved offscreen eventually
+-------------------
+design
 
-    does it depend on grid w and h?
-    yes it does hmm
+ok its a bit like super crate box
 
-    grid picking etc should be correct
+your inventory is just a list of guns and you go through them in order, single use
+you can also eat them to regain hp
+maybe throw them and they explode or something
+alt fire
+
+proc gen guns
+effect when eaten etc
+
+maybe take them to somewhere in the world and it juices them but then you have to pick them up and they go to back of queue
+and you would be big anticipate
+
+so yeah there would be a lot of snap planning, adapting etc
+
+spitegun: if it gets shot it shoots lol
+
+
+todo maybe factor out collisiongroup and force
+to handle collision filtering a bit more elegantly

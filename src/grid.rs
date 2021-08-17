@@ -1,4 +1,5 @@
 use crate::rect::*;
+use crate::vec2::*;
 
 // return some kind of cursor with a getabove, etc
 
@@ -54,9 +55,9 @@ impl Grid {
         self.get_rect_2d(x,y)
     }
 
-    pub fn get_xy_of_position(&self, x: f32, y: f32) -> Option<(i32, i32)> {
-        let ix = (x / self.elem_w) as i32;
-        let iy = (y / self.elem_h) as i32;
+    pub fn get_xy_of_position(&self, v: Vec2) -> Option<(i32, i32)> {
+        let ix = (v.x / self.elem_w) as i32;
+        let iy = (v.y / self.elem_h) as i32;
         if ix >= self.w || iy >= self.h || ix < 0 || iy < 0 {
             None
         } else {
@@ -64,9 +65,9 @@ impl Grid {
         }
     }
 
-    pub fn get_position(&self, x: f32, y: f32) -> Option<Tile> {
+    pub fn get_position(&self, v: Vec2) -> Option<Tile> {
         // i bet theres a big brain monad way to do this
-        if let Some((ix, iy)) = self.get_xy_of_position(x, y) {
+        if let Some((ix, iy)) = self.get_xy_of_position(v) {
             self.get_2d(ix, iy)
         } else {
             None
@@ -77,5 +78,5 @@ impl Grid {
 #[test]
 fn test_grid() {
     let g = Grid::new(10, 10, 1.0, 1.0);
-    assert_eq!(g.get_xy_of_position(5.5, 6.5), Some((5, 6)));
+    assert_eq!(g.get_xy_of_position(Vec2::new(5.5, 6.5)), Some((5, 6)));
 }

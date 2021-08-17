@@ -4,6 +4,7 @@ mod collision;
 mod entity;
 mod screen_transform;
 mod grid;
+mod vec2;
 
 use screen_transform::ScreenTransform;
 use sdl2::pixels::Color;

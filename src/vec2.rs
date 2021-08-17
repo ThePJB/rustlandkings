@@ -1,0 +1,16 @@
+#[derive(Copy, Clone, Debug)]
+pub struct Vec2 {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Vec2 {
+    pub fn new(x: f32, y: f32) -> Vec2 { Vec2{x, y} }
+    pub fn zero() -> Vec2 { Vec2::new(0.0, 0.0) }
+    pub fn sub(&self, other: Vec2) -> Vec2 { Vec2::new(self.x - other.x, self.y - other.y) }
+    pub fn add(&self, other: Vec2) -> Vec2 { Vec2::new(self.x + other.x, self.y + other.y) }
+    pub fn mul_scalar(&self, scalar: f32) -> Vec2 { Vec2::new(self.x * scalar, self.y * scalar) }
+    pub fn div_scalar(&self, scalar: f32) -> Vec2 { Vec2::new(self.x / scalar, self.y / scalar) }
+    pub fn magnitude(&self) -> f32 { (self.x*self.x + self.y*self.y).sqrt() }
+    pub fn normalize(&self) -> Vec2 { self.div_scalar(self.magnitude()) }
+}

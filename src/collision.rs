@@ -32,10 +32,11 @@ pub struct CollisionEvent {
 // chucks them into the vec
 pub fn simulate_entity_entity_collisions(entities: &HashMap<u32, Entity>, collisions: &mut Vec<CollisionEvent>, t: f32) {
     for (subject_key, subject) in entities {
-        if subject.is_static {continue};
+        if subject.collision_group == CollisionGroup::Static {continue};
+        // if player and own bullet continue
 
-        let dx = subject.vx * t;
-        let dy = subject.vy * t;
+        let dx = subject.velocity.x * t;
+        let dy = subject.velocity.y * t;
         let subject_rect_old = subject.aabb;
         let subject_rect_desired = Rect {
             x: subject_rect_old.x + dx,
@@ -46,6 +47,8 @@ pub fn simulate_entity_entity_collisions(entities: &HashMap<u32, Entity>, collis
 
         for (object_key, object) in entities {
             if *subject_key == *object_key {continue};
+            if subject.collision_group == CollisionGroup::Bullet && object.collision_group == CollisionGroup::Bullet {continue};
+
 
             let object_rect = object.aabb;
 
@@ -65,10 +68,10 @@ pub fn simulate_entity_entity_collisions(entities: &HashMap<u32, Entity>, collis
 
 pub fn simulate_entity_terrain_collisions(entities: &HashMap<u32, Entity>, terrain: &Grid, collisions: &mut Vec<CollisionEvent>, dt: f32) {
     for (subject_key, subject) in entities {
-        if subject.is_static {continue};
+        if subject.collision_group == CollisionGroup::Static {continue};
 
-        let dx = subject.vx * dt;
-        let dy = subject.vy * dt;
+        let dx = subject.velocity.x * dt;
+        let dy = subject.velocity.y * dt;
         let subject_rect_old = subject.aabb;
         let subject_rect_desired = Rect {
             x: subject_rect_old.x + dx,
@@ -77,7 +80,7 @@ pub fn simulate_entity_terrain_collisions(entities: &HashMap<u32, Entity>, terra
             h: subject_rect_old.h,
         };
         
-        if let Some((sx, sy)) = terrain.get_xy_of_position(subject.aabb.x, subject.aabb.y) {
+        if let Some((sx, sy)) = terrain.get_xy_of_position(subject.aabb.center()) {
             //println!("subject pos {} {}", sx, sy);
             for i in -1..1+1 {
                 for j in -1..1+1 {
@@ -145,8 +148,8 @@ fn clamp(val: f32, min: f32, max: f32) -> f32 {
 pub fn compute_movement(entities: &HashMap<u32, Entity>, collisions: &Vec<CollisionEvent>, movements: &mut Vec<(u32, f32, f32)>, dt: f32) {
     for (entity_key, entity) in entities.iter() {
         let (min_x, max_x, min_y, max_y) = movement_bounds(*entity_key, collisions);
-        let x_movt = clamp(entity.vx * dt, min_x, max_x);
-        let y_movt = clamp(entity.vy * dt, min_y, max_y);
+        let x_movt = clamp(entity.velocity.x * dt, min_x, max_x);
+        let y_movt = clamp(entity.velocity.y * dt, min_y, max_y);
 
         if x_movt != 0.0 || y_movt != 0.0 {
             movements.push((*entity_key, x_movt, y_movt));

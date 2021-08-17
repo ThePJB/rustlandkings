@@ -3,6 +3,7 @@ use crate::collision::*;
 use crate::entity::*;
 use crate::screen_transform::*;
 use crate::grid::*;
+use crate::vec2::*;
 
 use sdl2::pixels::Color;
 use sdl2::video::Window;
@@ -28,7 +29,7 @@ pub struct GameState {
     dead: bool,
 
     transform: ScreenTransform,
-    aim_pos: (f32, f32),
+    aim_pos: Vec2,
 
     terrain: Grid,
 
@@ -47,7 +48,7 @@ impl GameState {
             dead: false,
 
             transform: transform,
-            aim_pos: (0.5, 0.5),
+            aim_pos: Vec2::new(0.5, 0.5),
             terrain: GameState::generate_level(),
 
             selected_rect: (0, 0),
@@ -120,18 +121,18 @@ impl GameState {
 
     pub fn update_held_keys(&mut self, keys: &KeyboardState) {
         if keys.is_scancode_pressed(Scancode::A) {
-            self.entities.get_mut(&self.player_id).unwrap().vx = -movement_speed;
+            self.entities.get_mut(&self.player_id).unwrap().velocity.x = -movement_speed;
         } else if keys.is_scancode_pressed(Scancode::D) {
-            self.entities.get_mut(&self.player_id).unwrap().vx = movement_speed;
+            self.entities.get_mut(&self.player_id).unwrap().velocity.x = movement_speed;
         } else {
-            self.entities.get_mut(&self.player_id).unwrap().vx = 0.0;
+            self.entities.get_mut(&self.player_id).unwrap().velocity.x = 0.0;
         }
         if keys.is_scancode_pressed(Scancode::W) {
-            self.entities.get_mut(&self.player_id).unwrap().vy = -movement_speed;
+            self.entities.get_mut(&self.player_id).unwrap().velocity.y = -movement_speed;
         } else if keys.is_scancode_pressed(Scancode::S) {
-            self.entities.get_mut(&self.player_id).unwrap().vy = movement_speed;
+            self.entities.get_mut(&self.player_id).unwrap().velocity.y = movement_speed;
         } else {
-            self.entities.get_mut(&self.player_id).unwrap().vy = 0.0;
+            self.entities.get_mut(&self.player_id).unwrap().velocity.y = 0.0;
         }
     }
 
@@ -157,6 +158,8 @@ impl GameState {
         }
         compute_movement(&self.entities, &self.frame_collisions, &mut self.frame_movements, dt as f32);
         GameState::apply_movement(&mut self.entities, &self.frame_movements);
+        GameState::resolve_bullet_impacts(&mut self.entities, &self.frame_collisions);
+        GameState::cull_health(&mut self.entities);
     }
 
     pub fn apply_movement(entities: &mut HashMap<u32, Entity>, movements: &Vec<(u32, f32, f32)>) {
@@ -170,14 +173,45 @@ impl GameState {
     pub fn update_camera(&mut self, mouse: &MouseState) {
         self.aim_pos = self.transform.pick_world(mouse.x() as u32, mouse.y() as u32);
         let player_ent = self.entities.get(&self.player_id).unwrap();
-        self.transform.translate_center((self.aim_pos.0 + player_ent.aabb.x)/2.0, (self.aim_pos.1 + player_ent.aabb.y)/2.0);
+        self.transform.translate_center(self.aim_pos.add(player_ent.aabb.center()).div_scalar(2.0));
+    }
+
+    pub fn resolve_bullet_impacts(entities: &mut HashMap<u32, Entity>, collisions: &Vec<CollisionEvent>) {
+        for col in collisions.iter() {
+            if let Some(subject) = entities.get(&col.subject) {
+                if subject.collision_group == CollisionGroup::Bullet {
+                    match col.object {
+                        CollisionObject::Entity(id) => {
+                            if let Some(object) = entities.get(&id) {
+                                if object.force != subject.force {
+                                    println!("impact");
+                                    let mut new_object = object.clone();
+                                    new_object.health -= 1.0;
+                                    entities.insert(id, new_object);
+                                    entities.remove(&col.subject);
+                                }
+                            }
+                        },
+                        CollisionObject::Terrain(_x, _y) => {entities.remove(&col.subject);},
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn cull_health(entities: &mut HashMap<u32, Entity>) {
+        entities.retain(|_, e| e.health > 0.0);
     }
 
     pub fn handle_input(&mut self, e: Event) {
         match e {
             Event::MouseButtonDown{x, y, ..} => {
-                let (wx, wy) = self.transform.pick_world(x as u32, y as u32);
-                if let Some(pos) = self.terrain.get_xy_of_position(wx, wy) {
+                let world_click = self.transform.pick_world(x as u32, y as u32);
+                let player_pos = self.entities.get(&self.player_id).unwrap().aabb.center();
+
+                self.add_entity(Entity::new_bullet(player_pos, world_click));
+
+                if let Some(pos) = self.terrain.get_xy_of_position(world_click) {
                     self.selected_rect = pos;
                 }
             }
