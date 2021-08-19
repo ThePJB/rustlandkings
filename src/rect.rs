@@ -46,27 +46,6 @@ fn test_intersection() {
 
     assert_eq!(rect_intersection(Rect::new(0.0, 0.0, 1.0, 1.0,), Rect::new(0.5, -0.05, 0.1, 0.1)), true);
 }
-/*
-pub fn rect_intersection(a: Rect, b: Rect) -> bool {
-    //let epsilon = 0.001f32;
-    let epsilon = 0.0;
-    let a_d = a.dilate(-epsilon);
-    let b_d = b.dilate(-epsilon);
-    
-    // not sure if overkill
-    let a_in_b_x = (a_d.left() >= b_d.left() && a_d.left() <= b_d.right()) || (a_d.right() >= b_d.left() && a_d.right() <= b_d.right());
-    let b_in_a_x = (b_d.left() >= a_d.left() && b_d.left() <= a_d.right()) || (b_d.right() >= a_d.left() && b_d.right() <= a_d.right());
-    
-    let a_in_b_y = (a_d.top() >= b_d.top() && a_d.top() <= b_d.bot()) || (a_d.bot() >= b_d.top() && a_d.bot() <= b_d.bot());
-    let b_in_a_y = (b_d.top() >= a_d.top() && b_d.top() <= a_d.bot()) || (b_d.bot() >= a_d.top() && b_d.bot() <= a_d.bot());
-
-    let x_overlap = a_in_b_x || b_in_a_x;
-    let y_overlap = a_in_b_y || b_in_a_y;
-
-    return x_overlap && y_overlap;
-}
-*/
-
 
 pub fn rect_intersection(a: Rect, b: Rect) -> bool {
     //let epsilon = 0.001f32;

@@ -1,12 +1,7 @@
 rustland kings
-
-
-shooting
-
-barrels
+--------------
 
 enemies
-
 
 terrain generation
     noise?
@@ -14,16 +9,10 @@ terrain generation
     CA?
     random walk?
 
-fix sliding along walls
+fix sliding along walls.  if you are travelling diagonally you still hitch a bit
 
-------------------
-
-ok changing <= to <  and vice versa mostly fixed it. if you are travelling diagonally you still hitch a bit
-
-stop vscode putting in helpful characters for me please
-
--------------------
 design
+------
 
 ok its a bit like super crate box
 
@@ -39,9 +28,3 @@ maybe take them to somewhere in the world and it juices them but then you have t
 and you would be big anticipate
 
 so yeah there would be a lot of snap planning, adapting etc
-
-spitegun: if it gets shot it shoots lol
-
-
-todo maybe factor out collisiongroup and force
-to handle collision filtering a bit more elegantly

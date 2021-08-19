@@ -1,6 +1,9 @@
 use crate::rect::*;
 use crate::vec2::*;
+use crate::game::*;
+use crate::side_effect::*;
 
+use sdl2::controller::GameController;
 use sdl2::pixels::Color;
 
 
@@ -30,14 +33,25 @@ pub enum CollisionGroup {
     Other,    
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EntityType {
+    Player,
+    Bullet,
+    Crate,
+    Retaliator,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct Entity {
+    pub force: EntityForce,
+    pub collision_group: CollisionGroup,
+    pub variety: EntityType,
+    pub source: u32,
+    
     pub aabb: Rect,
     pub colour: Color,
     pub velocity: Vec2,
     pub draw_order: DrawOrder,
-    pub force: EntityForce,
-    pub collision_group: CollisionGroup,
     pub health: f32,
     pub last_hit: f32, // for iframes etc
 }
@@ -53,42 +67,54 @@ impl Entity {
             collision_group: CollisionGroup::Other,
             health: 5.0,
             last_hit: 0.0,
+            variety: EntityType::Player,
+            source: 0,
         }
     }
 
-    pub fn new_platform(player_x: f32, which: PlatformHeight) -> Entity {
-        Entity {
-            aabb: match which {
-                PlatformHeight::Top => Rect::new(player_x + 0.5, 0.4, 0.1, 0.05),
-                PlatformHeight::Middle => Rect::new(player_x + 0.4, 0.6, 0.1, 0.05),
-                PlatformHeight::Bottom => Rect::new(player_x + 0.3, 0.8, 0.1, 0.05),
-            },
-            colour: match which {
-                PlatformHeight::Top => Color::RGB(255,0,0),
-                PlatformHeight::Middle => Color::RGB(0, 255, 0),
-                PlatformHeight::Bottom => Color::RGB(0, 0, 255),
-            },
-            velocity: Vec2::zero(),
-            draw_order: DrawOrder::Front,
+    pub fn new_crate(x: f32, y: f32) -> Entity {
+        Entity { 
             force: EntityForce::Neutral,
             collision_group: CollisionGroup::Static,
-            health: 5.0,
+            variety: EntityType::Crate,
+            aabb: Rect::new_centered(x, y, 0.15, 0.15),
+            colour: Color::RGB(64, 64, 0),
+            velocity: Vec2::zero(),
+            draw_order: DrawOrder::Back, health: 4.0, 
             last_hit: 0.0,
+            source: 0,
         }
     }
 
-    pub fn new_bullet(from: Vec2, to: Vec2) -> Entity {
+    pub fn new_retalliator(x: f32, y: f32) -> Entity {
+        Entity { 
+            force: EntityForce::Neutral,
+            collision_group: CollisionGroup::Static,
+            variety: EntityType::Retaliator,
+            aabb: Rect::new_centered(x, y, 0.2, 0.2),
+            colour: Color::RGB(32, 32, 32),
+            velocity: Vec2::zero(),
+            draw_order: DrawOrder::Back, health: 10.0, 
+            last_hit: 0.0,
+            source: 0,
+        }
+    }
+
+    pub fn new_bullet(from: Vec2, to: Vec2, force: EntityForce, source: u32) -> Entity {
         let bullet_s = 0.02;
-        let bullet_speed = 3.0;
+        let bullet_speed = 2.0;
+
         Entity { 
             aabb: Rect::new_centered(from.x, from.y, bullet_s, bullet_s), 
             colour: Color::RGB(255, 255, 0), 
             velocity: to.sub(from).normalize().mul_scalar(bullet_speed),
             draw_order: DrawOrder::Front, 
-            force: EntityForce::Player,
+            force: force,
             collision_group: CollisionGroup::Bullet,
             health: 1.0,
             last_hit: 0.0,
+            variety: EntityType::Bullet,
+            source: source,
         }
     }
 }

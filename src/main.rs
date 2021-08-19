@@ -1,21 +1,23 @@
 mod game;
 mod rect;
-mod collision;
+mod systems;
 mod entity;
 mod screen_transform;
 mod grid;
 mod vec2;
+mod side_effect;
+mod simulation_state;
 
+use crate::game::*;
 use screen_transform::ScreenTransform;
 use sdl2::pixels::Color;
 use sdl2::keyboard::Keycode;
 use sdl2::event::Event;
-use game::GameState;
 use std::time::{Duration, SystemTime};
 
 fn main() {
-    let xres = 800;
-    let yres = 600;
+    let xres = 1280;
+    let yres = 720;
     let a = xres as f32 / yres as f32;
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -32,34 +34,22 @@ fn main() {
     let gravity = 3.5;
     let cam_vx = 0.4;
 
-    let mut state = GameState::new(ScreenTransform::new(xres, yres));
+    let mut game = Game::new(ScreenTransform::new(xres, yres));
     let mut dt = 1.0f64 / 60f64;
 
     'running: loop {
         let loop_start = SystemTime::now();
-        
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit {..} |
-                Event::KeyDown {keycode: Some(Keycode::Escape), ..} => {
-                    break 'running;
-                }
-                Event::KeyDown {keycode: Some(Keycode::R), ..} => {
-                    println!("===== reset =====");
-                    state = GameState::new(ScreenTransform::new(xres, yres));
-                }
-                _ => {state.handle_input(event)}
-            }
+
+        game.clear_arenas();
+        if !game.handle_input(&mut event_pump) {
+            break 'running;
         }
         
         canvas.set_draw_color(Color::RGB(200, 200, 255));
         canvas.clear();
         
-        state.update_held_keys(&event_pump.keyboard_state());
-        state.update(dt);
-        state.update_camera(&event_pump.mouse_state());
-        state.draw_terrain(&mut canvas);
-        state.draw_entities(&mut canvas, xres, yres);
+        game.update(dt);
+        game.draw(&mut canvas);
 
         canvas.present();
 

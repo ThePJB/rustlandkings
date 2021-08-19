@@ -3,8 +3,8 @@ use crate::vec2::*;
 
 #[derive(Clone, Copy, Debug)]
 pub struct ScreenTransform {
-    offset: Vec2,
-    px: (u32, u32),
+    pub offset: Vec2,
+    pub px: (u32, u32),
 }
 
 impl ScreenTransform {

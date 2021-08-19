@@ -14,7 +14,7 @@ pub enum CollisionDirection {
     Bad,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum CollisionObject {
     Entity(u32),
     Terrain(i32, i32),
@@ -27,6 +27,13 @@ pub struct CollisionEvent {
     pub dir: CollisionDirection,
     pub subject_rect: Rect,
     pub object_rect: Rect,
+}
+
+pub fn should_collide(f1: EntityForce, g1: CollisionGroup, f2: EntityForce, g2: CollisionGroup) -> bool {
+    // static subject handled early
+    if g1 == CollisionGroup::Bullet && g2 == CollisionGroup::Bullet { return false; }   // bullet-bullet
+    if g1 == CollisionGroup::Bullet && f1 == f2 { return false; }                       // friendly fire / shooting urself on the way out
+    return true;
 }
 
 // chucks them into the vec
@@ -47,8 +54,8 @@ pub fn simulate_entity_entity_collisions(entities: &HashMap<u32, Entity>, collis
 
         for (object_key, object) in entities {
             if *subject_key == *object_key {continue};
-            if subject.collision_group == CollisionGroup::Bullet && object.collision_group == CollisionGroup::Bullet {continue};
-
+            //if !(should_collide(subject.force, subject.collision_group, object.force, object.collision_group)) {continue};
+            if *object_key == subject.source {continue};
 
             let object_rect = object.aabb;
 
@@ -201,14 +208,5 @@ pub fn rect_collision_direction(subject_old: Rect, subject_desired: Rect, object
     } else {
         println!("bad collision");
         CollisionDirection::Bad
-    }
-}
-
-#[test]
-fn testasdas() {
-    for i in -1..1 {
-        for j in -1..1 {
-            println!("i j {} {} ", i, j)
-        }
     }
 }
