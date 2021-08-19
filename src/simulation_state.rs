@@ -34,6 +34,8 @@ impl SimulationState {
         };
 
         state.entities.insert(rand::thread_rng().gen(), Entity::new_player(0.4, 0.4));
+        state.entities.insert(rand::thread_rng().gen(), Entity::new_enemy(0.8, 1.1));
+        state.entities.insert(rand::thread_rng().gen(), Entity::new_enemy(1.5, 0.5));
 
         state.entities.insert(rand::thread_rng().gen(), Entity::new_crate(0.8, 0.4));
         state.entities.insert(rand::thread_rng().gen(), Entity::new_crate(0.8, 0.9));

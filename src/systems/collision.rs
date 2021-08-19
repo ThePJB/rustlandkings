@@ -54,7 +54,7 @@ pub fn simulate_entity_entity_collisions(entities: &HashMap<u32, Entity>, collis
 
         for (object_key, object) in entities {
             if *subject_key == *object_key {continue};
-            //if !(should_collide(subject.force, subject.collision_group, object.force, object.collision_group)) {continue};
+            if !(should_collide(subject.force, subject.collision_group, object.force, object.collision_group)) {continue};
             if *object_key == subject.source {continue};
 
             let object_rect = object.aabb;

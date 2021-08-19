@@ -2,6 +2,8 @@ rustland kings
 --------------
 
 enemies
+    red square
+    AI system issues commands
 
 terrain generation
     noise?

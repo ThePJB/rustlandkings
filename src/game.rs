@@ -8,6 +8,7 @@ use crate::simulation_state::*;
 use crate::systems::command::*;
 use crate::systems::collision::*;
 use crate::systems::projectiles::*;
+use crate::systems::ai::*;
 
 use sdl2::pixels::Color;
 use sdl2::video::Window;
@@ -162,6 +163,8 @@ impl Game {
 
     pub fn update(&mut self, dt: f64) {
         if self.pause { return; }
+
+        compute_ai_commands(&self.state, &mut self.frame_commands);
 
         for command in self.frame_commands.iter() {
             apply_command(&mut self.state, *command);

@@ -17,7 +17,15 @@ pub fn apply_command(state: &mut SimulationState, command: Command) {
             }
         },
         Command::Shoot(shooter_id, target) => {
-            if let Some(shooter) = state.entities.get(&shooter_id) {
+            let can_shoot = if let Some(shooter) = state.entities.get(&shooter_id) {
+                state.time as f32 - shooter.last_shoot > shooter.cooldown
+            } else {
+                false
+            };
+
+            if can_shoot {
+                state.entities.get_mut(&shooter_id).unwrap().last_shoot = state.time as f32;
+                let shooter = state.entities.get(&shooter_id).unwrap();
                 let start_pos = shooter.aabb.center();
                 state.entities.insert(rand::thread_rng().gen(), Entity::new_bullet(start_pos, target, shooter.force, shooter_id));
             }

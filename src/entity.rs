@@ -39,6 +39,7 @@ pub enum EntityType {
     Bullet,
     Crate,
     Retaliator,
+    Enemy,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -54,6 +55,9 @@ pub struct Entity {
     pub draw_order: DrawOrder,
     pub health: f32,
     pub last_hit: f32, // for iframes etc
+
+    pub cooldown: f32,
+    pub last_shoot: f32,
 }
 
 impl Entity {
@@ -69,6 +73,25 @@ impl Entity {
             last_hit: 0.0,
             variety: EntityType::Player,
             source: 0,
+            cooldown: 0.01,
+            last_shoot: 0.0,
+        }
+    }
+
+    pub fn new_enemy(x: f32, y: f32) -> Entity {
+        Entity {
+            aabb: Rect::new(x, y, 0.05, 0.05),
+            colour: Color::RGB(255, 0, 0),
+            velocity: Vec2::zero(),
+            draw_order: DrawOrder::Front,
+            force: EntityForce::Enemy,
+            collision_group: CollisionGroup::Other,
+            health: 5.0,
+            last_hit: 0.0,
+            variety: EntityType::Enemy,
+            source: 0,
+            cooldown: 0.25,
+            last_shoot: 0.0,
         }
     }
 
@@ -83,6 +106,8 @@ impl Entity {
             draw_order: DrawOrder::Back, health: 4.0, 
             last_hit: 0.0,
             source: 0,
+            cooldown: 0.5,
+            last_shoot: 0.0,
         }
     }
 
@@ -97,12 +122,14 @@ impl Entity {
             draw_order: DrawOrder::Back, health: 10.0, 
             last_hit: 0.0,
             source: 0,
+            cooldown: 0.5,
+            last_shoot: 0.0,
         }
     }
 
     pub fn new_bullet(from: Vec2, to: Vec2, force: EntityForce, source: u32) -> Entity {
         let bullet_s = 0.02;
-        let bullet_speed = 2.0;
+        let bullet_speed = 0.6;
 
         Entity { 
             aabb: Rect::new_centered(from.x, from.y, bullet_s, bullet_s), 
@@ -115,6 +142,8 @@ impl Entity {
             last_hit: 0.0,
             variety: EntityType::Bullet,
             source: source,
+            cooldown: 0.5,
+            last_shoot: 0.0,
         }
     }
 }

@@ -2,13 +2,6 @@ use crate::{side_effect::SideEffect, simulation_state::*};
 use crate::systems::collision::*;
 use crate::entity::*;
 
-/*
-pub struct BulletImpact {
-    target: CollisionObject,
-    bullet: u32,
-}
-*/
-
 pub fn handle_bullet_impacts(state: &SimulationState, collisions: &Vec<CollisionEvent>, effects: &mut Vec<SideEffect>) {
     for col in collisions.iter() {
         if let Some(subject) = state.entities.get(&col.subject) {
