@@ -129,7 +129,7 @@ impl Entity {
 
     pub fn new_bullet(from: Vec2, to: Vec2, force: EntityForce, source: u32) -> Entity {
         let bullet_s = 0.02;
-        let bullet_speed = 0.6;
+        let bullet_speed = 0.7;
 
         Entity { 
             aabb: Rect::new_centered(from.x, from.y, bullet_s, bullet_s), 

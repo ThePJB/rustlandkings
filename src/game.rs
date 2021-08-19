@@ -21,9 +21,6 @@ use sdl2::keyboard::Scancode;
 use sdl2::mouse::MouseState;
 use std::collections::HashMap;
 use rand::Rng;
-
-static movement_speed: f32 = 0.5;
-
 pub struct Game {
     pause: bool,
     
@@ -100,7 +97,7 @@ impl Game {
 
         self.aim_pos = self.transform.pick_world(mouse.x() as u32, mouse.y() as u32);
         if let Some(player_ent) = self.state.entities.get(&self.player_id) {
-            self.transform.translate_center(self.aim_pos.add(player_ent.aabb.center()).div_scalar(2.0));
+            self.transform.translate_center(player_ent.aabb.center().lerp(self.aim_pos, 0.3));
         }
 
         // Handle events
