@@ -24,7 +24,7 @@ impl Grid {
             h: h,
             elem_w: elem_w,
             elem_h: elem_h,
-            tiles: vec![Tile::Ground; (w*h) as usize],
+            tiles: vec![Tile::Wall; (w*h) as usize],
         }
     }
 

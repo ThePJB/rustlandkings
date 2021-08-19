@@ -63,7 +63,7 @@ pub struct Entity {
 impl Entity {
     pub fn new_player(x: f32, y: f32) -> Entity {
         Entity {
-            aabb: Rect::new(x, y, 0.05, 0.05),
+            aabb: Rect::new_centered(x, y, 0.05, 0.05),
             colour: Color::RGB(255, 255, 255),
             velocity: Vec2::zero(),
             draw_order: DrawOrder::Front,
@@ -80,7 +80,7 @@ impl Entity {
 
     pub fn new_enemy(x: f32, y: f32) -> Entity {
         Entity {
-            aabb: Rect::new(x, y, 0.05, 0.05),
+            aabb: Rect::new_centered(x, y, 0.05, 0.05),
             colour: Color::RGB(255, 0, 0),
             velocity: Vec2::zero(),
             draw_order: DrawOrder::Front,
@@ -100,7 +100,7 @@ impl Entity {
             force: EntityForce::Neutral,
             collision_group: CollisionGroup::Static,
             variety: EntityType::Crate,
-            aabb: Rect::new_centered(x, y, 0.15, 0.15),
+            aabb: Rect::new_centered(x, y, 0.1, 0.1),
             colour: Color::RGB(64, 64, 0),
             velocity: Vec2::zero(),
             draw_order: DrawOrder::Back, health: 4.0, 
@@ -116,7 +116,7 @@ impl Entity {
             force: EntityForce::Neutral,
             collision_group: CollisionGroup::Static,
             variety: EntityType::Retaliator,
-            aabb: Rect::new_centered(x, y, 0.2, 0.2),
+            aabb: Rect::new_centered(x, y, 0.15, 0.15),
             colour: Color::RGB(32, 32, 32),
             velocity: Vec2::zero(),
             draw_order: DrawOrder::Back, health: 10.0, 

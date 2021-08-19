@@ -24,7 +24,7 @@ impl SimulationState {
                 }
             },
             SideEffect::SpawnCircBullets(n_bullets, _damage, force, pos, source) => {
-                for i in 1..n_bullets {
+                for i in 0..n_bullets {
                     let i_frac = i as f32 / n_bullets as f32;
                     let dirn_vec = Vec2::new((i_frac * 2.0*PI).sin(),(i_frac * 2.0*PI).cos());
                     

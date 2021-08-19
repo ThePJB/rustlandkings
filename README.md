@@ -9,7 +9,7 @@ terrain generation
     noise?
     graph substitution grammar?
     CA?
-    random walk?
+    random walk? ---- this one lol. random walkers have a chance to change direction or not. could have each one turn into an entity.
 
 fix sliding along walls.  if you are travelling diagonally you still hitch a bit
 
@@ -30,3 +30,8 @@ maybe take them to somewhere in the world and it juices them but then you have t
 and you would be big anticipate
 
 so yeah there would be a lot of snap planning, adapting etc
+
+
+---------
+kek right now its a puzzle game where you kill by using them against each other
+ultimate pacifism

@@ -50,7 +50,8 @@ impl Game {
             player_id: 0,
             aim_pos: Vec2::zero(),
             transform: transform, 
-            state: SimulationState::new()
+            //state: SimulationState::new()
+            state: generate_level_drunk(),
         };
 
         game.initialize();
@@ -118,7 +119,7 @@ impl Game {
                 },
                 Event::KeyDown{keycode: Some(Keycode::R), ..} => {
                     println!("===== reset =====");
-                    self.state = SimulationState::new();
+                    self.state = generate_level_drunk();
                     self.initialize();
                 },
                 _ => {},
