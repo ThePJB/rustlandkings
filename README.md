@@ -1,6 +1,15 @@
-rustland kings
---------------
+# rustland kings
+## Build instructions
+`cargo run` should be sufficient
+might need sdl2 or something
 
+## How to play
+wasd and click
+r to reset
+
+
+
+### todos
 enemies
     red square
     AI system issues commands
@@ -30,7 +39,6 @@ maybe take them to somewhere in the world and it juices them but then you have t
 and you would be big anticipate
 
 so yeah there would be a lot of snap planning, adapting etc
-
 
 ---------
 kek right now its a puzzle game where you kill by using them against each other
