@@ -40,6 +40,7 @@ pub enum EntityType {
     Crate,
     Retaliator,
     Enemy,
+    Swarmer,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -58,6 +59,8 @@ pub struct Entity {
 
     pub cooldown: f32,
     pub last_shoot: f32,
+
+    pub melee_damage: f32,
 }
 
 impl Entity {
@@ -75,12 +78,13 @@ impl Entity {
             source: 0,
             cooldown: 0.01,
             last_shoot: 0.0,
+            melee_damage: 0.0,
         }
     }
 
     pub fn new_enemy(x: f32, y: f32) -> Entity {
         Entity {
-            aabb: Rect::new_centered(x, y, 0.05, 0.05),
+            aabb: Rect::new_centered(x, y, 0.08, 0.08),
             colour: Color::RGB(255, 0, 0),
             velocity: Vec2::zero(),
             draw_order: DrawOrder::Front,
@@ -92,9 +96,19 @@ impl Entity {
             source: 0,
             cooldown: 0.25,
             last_shoot: 0.0,
+            melee_damage: 0.0,
         }
     }
-
+    
+    pub fn new_swarmer(x: f32, y: f32) -> Entity {
+        let mut enemy = Entity::new_enemy(x, y);
+        enemy.variety = EntityType::Swarmer;
+        enemy.colour = Color::RGB(128, 0, 0);
+        enemy.aabb = Rect::new_centered(x, y, 0.05, 0.05);
+        enemy.melee_damage = 5.0;
+        return enemy;
+    }
+    
     pub fn new_crate(x: f32, y: f32) -> Entity {
         Entity { 
             force: EntityForce::Neutral,
@@ -108,6 +122,7 @@ impl Entity {
             source: 0,
             cooldown: 0.5,
             last_shoot: 0.0,
+            melee_damage: 0.0,
         }
     }
 
@@ -124,6 +139,7 @@ impl Entity {
             source: 0,
             cooldown: 0.5,
             last_shoot: 0.0,
+            melee_damage: 0.0,
         }
     }
 
@@ -144,6 +160,7 @@ impl Entity {
             source: source,
             cooldown: 0.5,
             last_shoot: 0.0,
+            melee_damage: 0.0,
         }
     }
 }

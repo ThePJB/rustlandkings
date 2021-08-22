@@ -1,4 +1,4 @@
-# rustland kings
+# rustland kings aka squareforce one
 ## Build instructions
 `cargo run` should be sufficient
 might need sdl2 or something
@@ -10,9 +10,17 @@ r to reset
 
 
 ### todos
-enemies
-    red square
-    AI system issues commands
+
+Gunplay - different gun pickups with different properties
+
+fixing collisions when the parties run at each other: n^2 through collision list
+maybe can combine or modify the events to the speed * dt of where they would have ended up
+
+enemies - AI
+    - swarmer enemy
+    - naviagation system
+    - spawn distribution
+    - random wander with raycast
 
 terrain generation
     noise?

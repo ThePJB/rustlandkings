@@ -2,6 +2,7 @@ use crate::rect::*;
 use crate::entity::*;
 use crate::screen_transform::*;
 use crate::grid::*;
+use crate::systems::melee_damage::handle_melee_damage;
 use crate::vec2::*;
 use crate::side_effect::*;
 use crate::simulation_state::*;
@@ -161,6 +162,7 @@ impl Game {
 
     pub fn update(&mut self, dt: f64) {
         if self.pause { return; }
+        self.state.dt = dt;
 
         compute_ai_commands(&self.state, &mut self.frame_commands);
 
@@ -180,6 +182,7 @@ impl Game {
                 }
             }
         }
+        handle_melee_damage(&self.state, &self.frame_collisions, &mut self.frame_side_effects);
         compute_movement(&self.state.entities, &self.frame_collisions, &mut self.frame_movements, dt as f32);
 
         // apply movements: a bit oldschool and maybe silly

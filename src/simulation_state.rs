@@ -6,6 +6,7 @@ use rand::Rng;
 
 pub struct SimulationState {
     pub time: f64,
+    pub dt: f64,
     pub terrain: Grid,
     pub entities: HashMap<u32, Entity>,
 }
@@ -32,10 +33,10 @@ struct Walker {
 }
 
 pub fn generate_level_drunk() -> SimulationState {
-    let side_length = 20;
+    let side_length = 40;
     let elem_size = 0.2;
     let num_walkers = 40;
-    let walk_iters = 10;
+    let walk_iters = 20;
     let p_change_dir = 0.3;
 
     let mut g = Grid::new(side_length, side_length, elem_size, elem_size);
@@ -45,9 +46,12 @@ pub fn generate_level_drunk() -> SimulationState {
     
     for i in 0..num_walkers {
         walkers.push(Walker {
+            pos: (side_length/2, side_length/2),
+            /*
             pos: 
                 (rand::thread_rng().gen_range(1..side_length-1),
                 rand::thread_rng().gen_range(1..side_length-1)),
+            */
             dir: rand::thread_rng().gen_range(0..4),
             alive: true,
         });
@@ -99,16 +103,18 @@ pub fn generate_level_drunk() -> SimulationState {
     for w in walkers[1..].iter() {
         let walker_pos = g.get_rect_2d(w.pos.0, w.pos.1).center();
                                                                         
-        entities.insert(rand::thread_rng().gen(), match rand::thread_rng().gen_range(0..3) {
+        entities.insert(rand::thread_rng().gen(), match rand::thread_rng().gen_range(0..4) {
             0 => {Entity::new_enemy(walker_pos.x, walker_pos.y)}
             1 => {Entity::new_crate(walker_pos.x, walker_pos.y)}
             2 => {Entity::new_retalliator(walker_pos.x, walker_pos.y)}
+            3 => {Entity::new_swarmer(walker_pos.x, walker_pos.y)}
             _ => {panic!("shouldnt happen")},
         });
     }
 
     return SimulationState {
         time: 0.0,
+        dt: 0.016,
         entities: entities,
         terrain: g,
     };
@@ -119,6 +125,7 @@ impl SimulationState {
     pub fn new() -> SimulationState {
         let mut state = SimulationState {
             time: 0.0,
+            dt: 0.016,
             terrain: generate_level(),
             entities: HashMap::new(),
         };
