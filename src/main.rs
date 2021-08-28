@@ -18,7 +18,6 @@ use std::time::{Duration, SystemTime};
 fn main() {
     let xres = 1280;
     let yres = 720;
-    let a = xres as f32 / yres as f32;
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
     let window = video_subsystem.window("rustland kings", xres, yres)
@@ -30,9 +29,6 @@ fn main() {
         .expect("couldnt make canvas");
 
     let mut event_pump = sdl_context.event_pump().unwrap();
-
-    let gravity = 3.5;
-    let cam_vx = 0.4;
 
     let mut game = Game::new(ScreenTransform::new(xres, yres));
     let mut dt = 1.0f64 / 60f64;

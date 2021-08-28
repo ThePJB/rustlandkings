@@ -31,7 +31,6 @@ pub struct Game {
     frame_side_effects: Vec<SideEffect>,
 
     player_id: u32,
-    aim_pos: Vec2,
     transform: ScreenTransform,
 
     state: SimulationState,
@@ -46,7 +45,6 @@ impl Game {
             frame_movements: Vec::new(), 
             frame_side_effects: Vec::new(), 
             player_id: 0,
-            aim_pos: Vec2::zero(),
             transform: transform, 
             //state: SimulationState::new()
             state: generate_level_drunk(),
@@ -96,10 +94,17 @@ impl Game {
         // Handle mouse position
         let mouse = event_pump.mouse_state();
 
-        self.aim_pos = self.transform.pick_world(mouse.x() as u32, mouse.y() as u32);
-        if let Some(player_ent) = self.state.entities.get(&self.player_id) {
-            self.transform.translate_center(player_ent.aabb.center().lerp(self.aim_pos, 0.3));
+        let aim_pos = self.transform.pick_world(mouse.x() as u32, mouse.y() as u32);
+        if let Some(mut player_ent) = self.state.entities.get_mut(&self.player_id) {
+            self.transform.translate_center(player_ent.aabb.center().lerp(aim_pos, 0.3));
+            player_ent.look_direction = aim_pos.sub(player_ent.aabb.center()).normalize();
+            
+            // Handle held mouse
+            if mouse.left() && player_ent.gun.automatic {
+                self.frame_commands.push(Command::Shoot(self.player_id));
+            }
         }
+
 
         // Handle events
         for event in event_pump.poll_iter() {
@@ -109,11 +114,40 @@ impl Game {
                     return false;
                 }
                 Event::MouseButtonDown{x, y, ..} => {
-                    let world_click = self.transform.pick_world(x as u32, y as u32);
-                    self.frame_commands.push(Command::Shoot(self.player_id, world_click));
+                    self.frame_commands.push(Command::Shoot(self.player_id));
                 },
                 Event::KeyDown{keycode: Some(Keycode::P), ..} => {
                     self.pause = !self.pause;
+                },
+                Event::KeyDown{keycode: Some(Keycode::Num1), ..} => {
+                    // may have to make a side effect
+                    if let Some(player) = self.state.entities.get_mut(&self.player_id) {
+                        player.gun = Gun::new_pistol();
+                    }
+                },
+                Event::KeyDown{keycode: Some(Keycode::Num2), ..} => {
+                    // may have to make a side effect
+                    if let Some(player) = self.state.entities.get_mut(&self.player_id) {
+                        player.gun = Gun::new_makina();
+                    }
+                },
+                Event::KeyDown{keycode: Some(Keycode::Num3), ..} => {
+                    // may have to make a side effect
+                    if let Some(player) = self.state.entities.get_mut(&self.player_id) {
+                        player.gun = Gun::new_burst_rifle();
+                    }
+                },
+                Event::KeyDown{keycode: Some(Keycode::Num4), ..} => {
+                    // may have to make a side effect
+                    if let Some(player) = self.state.entities.get_mut(&self.player_id) {
+                        player.gun = Gun::new_shotgun();
+                    }
+                },
+                Event::KeyDown{keycode: Some(Keycode::Num5), ..} => {
+                    // may have to make a side effect
+                    if let Some(player) = self.state.entities.get_mut(&self.player_id) {
+                        player.gun = Gun::new_scattergun();
+                    }
                 },
                 Event::KeyDown{keycode: Some(Keycode::R), ..} => {
                     println!("===== reset =====");
@@ -174,6 +208,7 @@ impl Game {
 
         simulate_entity_entity_collisions(&self.state.entities, &mut self.frame_collisions, dt as f32);
         simulate_entity_terrain_collisions(&self.state.entities, &self.state.terrain, &mut self.frame_collisions, dt as f32);
+
         for col in self.frame_collisions.iter() {
             if col.subject == self.player_id {
                 match col.object {
@@ -182,6 +217,7 @@ impl Game {
                 }
             }
         }
+
         handle_melee_damage(&self.state, &self.frame_collisions, &mut self.frame_side_effects);
         compute_movement(&self.state.entities, &self.frame_collisions, &mut self.frame_movements, dt as f32);
 

@@ -1,12 +1,14 @@
 use crate::vec2::*;
 use crate::simulation_state::*;
+use crate::systems::projectiles::*;
 use crate::entity::*;
 use rand::Rng;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Command {
     Walk(u32, Vec2), // walker, direction (or stop by doing 0.0)
-    Shoot(u32, Vec2), // shooter, target
+    Look(u32, Vec2), // looker, dir
+    Shoot(u32), // shooter
 }
 
 pub fn apply_command(state: &mut SimulationState, command: Command) {
@@ -16,18 +18,17 @@ pub fn apply_command(state: &mut SimulationState, command: Command) {
                 walker.velocity = direction.mul_scalar(0.6);
             }
         },
-        Command::Shoot(shooter_id, target) => {
-            let can_shoot = if let Some(shooter) = state.entities.get(&shooter_id) {
-                state.time as f32 - shooter.last_shoot > shooter.cooldown
-            } else {
-                false
-            };
-
-            if can_shoot {
-                state.entities.get_mut(&shooter_id).unwrap().last_shoot = state.time as f32;
-                let shooter = state.entities.get(&shooter_id).unwrap();
-                let start_pos = shooter.aabb.center();
-                state.entities.insert(rand::thread_rng().gen(), Entity::new_bullet(start_pos, target, shooter.force, shooter_id));
+        Command::Look(id, dir) => {
+            if let Some(mut looker) = state.entities.get_mut(&id) {
+                looker.look_direction = dir;
+            }
+        }
+        Command::Shoot(shooter_id) => {
+            if let Some(mut shooter) = state.entities.get_mut(&shooter_id) {
+                let bullets = shoot_gun(&mut shooter, shooter_id, state.time as f32);
+                for bullet in bullets {
+                    state.entities.insert(rand::thread_rng().gen(), bullet);
+                }
             }
         },
     }

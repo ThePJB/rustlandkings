@@ -87,32 +87,31 @@ pub fn simulate_entity_terrain_collisions(entities: &HashMap<u32, Entity>, terra
             h: subject_rect_old.h,
         };
         
-        if let Some((sx, sy)) = terrain.get_xy_of_position(subject.aabb.center()) {
-            //println!("subject pos {} {}", sx, sy);
-            for i in -1..1+1 {
-                for j in -1..1+1 {
-                    let x = sx + i;
-                    let y = sy + j;
-                    let t = terrain.get_2d(x, y);
+        let (sx, sy) = terrain.get_xy_of_position(subject.aabb.center());
+        //println!("subject pos {} {}", sx, sy);
+        for i in -1..1+1 {
+            for j in -1..1+1 {
+                let x = sx + i;
+                let y = sy + j;
+                let t = terrain.get_2d(x, y);
 
-                    if t == Some(Tile::Ground) {continue;}
-                    if t == None {continue;}
-                    
-                    let object_rect = terrain.get_rect_2d(x, y);
-                    if rect_intersection(subject_rect_desired, object_rect) {
-                        let collision_dir = rect_collision_direction(subject_rect_old, subject_rect_desired, object_rect);
-                        if collision_dir == CollisionDirection::Bad {
-                            println!("bad collision!");
-                            continue;
-                        }
-                        collisions.push(CollisionEvent {
-                            dir: collision_dir,
-                            subject: *subject_key,
-                            object: CollisionObject::Terrain(x, y),
-                            subject_rect: subject.aabb,
-                            object_rect: object_rect,
-                        });
+                if t == Some(Tile::Ground) {continue;}
+                if t == None {continue;}
+                
+                let object_rect = terrain.get_rect_2d(x, y);
+                if rect_intersection(subject_rect_desired, object_rect) {
+                    let collision_dir = rect_collision_direction(subject_rect_old, subject_rect_desired, object_rect);
+                    if collision_dir == CollisionDirection::Bad {
+                        println!("bad collision!");
+                        continue;
                     }
+                    collisions.push(CollisionEvent {
+                        dir: collision_dir,
+                        subject: *subject_key,
+                        object: CollisionObject::Terrain(x, y),
+                        subject_rect: subject.aabb,
+                        object_rect: object_rect,
+                    });
                 }
             }
         }

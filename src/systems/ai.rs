@@ -9,8 +9,9 @@ pub fn compute_ai_commands(state: &SimulationState, commands: &mut Vec<Command>)
                 // look for a target to shoot
                 for (target_id, target) in state.entities.iter().filter(|(_, e)| e.variety == EntityType::Player) {
                     let distance = enemy.aabb.center().sub(target.aabb.center()).magnitude();
-                    if distance < 0.5 {
-                        commands.push(Command::Shoot(*enemy_id, target.aabb.center()));
+                    if distance < 0.5 && state.terrain.raycast(enemy.aabb.center(), target.aabb.center()) == None {
+                        commands.push(Command::Look(*enemy_id, target.aabb.center().sub(enemy.aabb.center()).normalize()));
+                        commands.push(Command::Shoot(*enemy_id));
                     }
                 }
             },
@@ -18,7 +19,7 @@ pub fn compute_ai_commands(state: &SimulationState, commands: &mut Vec<Command>)
                 for (target_id, target) in state.entities.iter().filter(|(_, e)| e.variety == EntityType::Player) {
                     let distance = enemy.aabb.center().sub(target.aabb.center()).magnitude();
                     let dir = target.aabb.center().sub(enemy.aabb.center()).normalize();
-                    if distance < 1.0 {
+                    if distance < 1.0 && state.terrain.raycast(enemy.aabb.center(), target.aabb.center()) == None {
                         commands.push(Command::Walk(*enemy_id, dir));
                     }
                 }

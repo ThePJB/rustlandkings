@@ -2,6 +2,7 @@ use crate::rect::*;
 use crate::vec2::*;
 use crate::game::*;
 use crate::side_effect::*;
+use crate::systems::projectiles::*;
 
 use sdl2::controller::GameController;
 use sdl2::pixels::Color;
@@ -61,6 +62,8 @@ pub struct Entity {
     pub last_shoot: f32,
 
     pub melee_damage: f32,
+    pub look_direction: Vec2,
+    pub gun: Gun,
 }
 
 impl Entity {
@@ -79,6 +82,9 @@ impl Entity {
             cooldown: 0.01,
             last_shoot: 0.0,
             melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            //gun: Gun::new_makina(),
+            gun: Gun::new_burst_rifle(),
         }
     }
 
@@ -97,6 +103,8 @@ impl Entity {
             cooldown: 0.25,
             last_shoot: 0.0,
             melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            gun: Gun::new_npc_gun(),
         }
     }
     
@@ -123,6 +131,8 @@ impl Entity {
             cooldown: 0.5,
             last_shoot: 0.0,
             melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            gun: Gun::new_pistol(),
         }
     }
 
@@ -140,17 +150,19 @@ impl Entity {
             cooldown: 0.5,
             last_shoot: 0.0,
             melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            gun: Gun::new_pistol(),
         }
     }
 
-    pub fn new_bullet(from: Vec2, to: Vec2, force: EntityForce, source: u32) -> Entity {
+    pub fn new_bullet(from: Vec2, dir: Vec2, force: EntityForce, source: u32) -> Entity {
         let bullet_s = 0.02;
         let bullet_speed = 0.7;
 
         Entity { 
             aabb: Rect::new_centered(from.x, from.y, bullet_s, bullet_s), 
             colour: Color::RGB(255, 255, 0), 
-            velocity: to.sub(from).normalize().mul_scalar(bullet_speed),
+            velocity: dir.mul_scalar(bullet_speed),
             draw_order: DrawOrder::Front, 
             force: force,
             collision_group: CollisionGroup::Bullet,
@@ -161,6 +173,8 @@ impl Entity {
             cooldown: 0.5,
             last_shoot: 0.0,
             melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            gun: Gun::new_pistol(),
         }
     }
 }

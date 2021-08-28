@@ -11,6 +11,10 @@ r to reset
 
 ### todos
 
+do the freecell thing of seed leaderboard seederboard. could have like elo
+really in 2021 its trivialy easy to get like big web interactive shit running, like that chat room that was on hn. have that in game lobby
+that but click to change colour / bump to keep alive, or u can reply and get nodes linked
+
 Gunplay - different gun pickups with different properties
 
 fixing collisions when the parties run at each other: n^2 through collision list
@@ -51,3 +55,57 @@ so yeah there would be a lot of snap planning, adapting etc
 ---------
 kek right now its a puzzle game where you kill by using them against each other
 ultimate pacifism
+
+
+------------
+
+command pattern going to be good for sounds and shit
+
+
+---- 
+
+gun bursting kind of fixed
+what next
+enemy ai? random wander
+behaviour trees??? 
+better level generation?
+
+behav trees hectic i think for this maybe just code it...
+just pick state vs
+fsm vs
+behav trees
+
+just want em to wander, stand, pursue, engage, dodge, flee
+idle vs in combat
+dont accidently make a programming language lol
+
+--------------------
+entities need a LookDir so guns can keep shootin
+    ok done now i can make guns keep shooting somehow. through AI or updating guns? updating guns seems better
+    
+and also for their looking
+grid needs a raycast for visibility
+
+------------
+honestly think typed normals are a good idea
+bruh my early returns in rust so hard. oh nah ? operator for that. sick as
+
+-----------
+
+ok so its marching the ray in the wrong direction and incrementing x by infinity
+
+ok it kind of works it sometimes gets stuck in infinite loops.
+might be broken in the - direction case
+
+----------
+wait wtf at the one where it should return Some(pos) it actually stalls for a turn and then misses it
+also suspicious amount of y movement in this test
+next tile in doesnt make any goddamn sense
+
+nearly perf
+there is a deadzone tho
+e in middle p in bottom right of square
+####
+##p#
+#e #
+####

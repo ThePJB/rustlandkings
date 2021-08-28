@@ -28,7 +28,7 @@ impl SimulationState {
                     let i_frac = i as f32 / n_bullets as f32;
                     let dirn_vec = Vec2::new((i_frac * 2.0*PI).sin(),(i_frac * 2.0*PI).cos());
                     
-                    self.entities.insert(rand::thread_rng().gen(), Entity::new_bullet(pos, pos.add(dirn_vec), force, source));
+                    self.entities.insert(rand::thread_rng().gen(), Entity::new_bullet(pos, dirn_vec, force, source));
                 }
             },
             SideEffect::None => {},
