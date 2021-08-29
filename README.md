@@ -64,48 +64,21 @@ command pattern going to be good for sounds and shit
 
 ---- 
 
-gun bursting kind of fixed
-what next
-enemy ai? random wander
-behaviour trees??? 
-better level generation?
-
-behav trees hectic i think for this maybe just code it...
-just pick state vs
-fsm vs
-behav trees
-
-just want em to wander, stand, pursue, engage, dodge, flee
-idle vs in combat
-dont accidently make a programming language lol
-
---------------------
-entities need a LookDir so guns can keep shootin
-    ok done now i can make guns keep shooting somehow. through AI or updating guns? updating guns seems better
-    
-and also for their looking
-grid needs a raycast for visibility
-
-------------
-honestly think typed normals are a good idea
-bruh my early returns in rust so hard. oh nah ? operator for that. sick as
-
------------
-
-ok so its marching the ray in the wrong direction and incrementing x by infinity
-
-ok it kind of works it sometimes gets stuck in infinite loops.
-might be broken in the - direction case
-
+Generation
 ----------
-wait wtf at the one where it should return Some(pos) it actually stalls for a turn and then misses it
-also suspicious amount of y movement in this test
-next tile in doesnt make any goddamn sense
+Yeah idk maybe author some maps could be cool
 
-nearly perf
-there is a deadzone tho
-e in middle p in bottom right of square
-####
-##p#
-#e #
-####
+Mechanics
+---------
+Add gun fifo
+add eating guns
+add hp
+
+
+Enemies
+-------
+Sprayer
+    sprayer smg cunt tries to get within his short range to shoot at you
+
+Bigdog
+    big and slow and tanky, double shotgun

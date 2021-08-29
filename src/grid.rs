@@ -148,7 +148,7 @@ impl Grid {
                     println!("move in x direction");
                     let x_to_march = x_distance;
                     let y_to_march = ray_dir.div_scalar(ray_dir.x).mul_scalar(x_distance).y;
-                    (x_to_march, y_to_march)
+                    (x_to_march.abs(), y_to_march.abs())
                 } else {
                     println!("move in y direction");
                     let y_to_march = y_distance;
@@ -179,16 +179,36 @@ impl Grid {
     }
 }
 
-// probably should make grid super tight to being on edges and shit
-// any algorithm with floating point is annoying as fuck lol
-// but thats a bad attitude its just bytes
-
-// need to keep track properly of paid and unpaid
-
-// im also not accounting for grid size
-
 #[test]
 fn test_raycast() {
+    {
+        /*
+        ####
+        #e##
+        # ##
+        # p#
+        ####
+        */
+        let mut g = Grid::new(10, 10, 1.0, 1.0);
+        g.set_2d(1, 1, Tile::Ground);
+        g.set_2d(1, 2, Tile::Ground);
+        g.set_2d(1, 3, Tile::Ground);
+        g.set_2d(2, 3, Tile::Ground);
+        assert_eq!(g.raycast(Vec2::new(1.5, 1.5), Vec2::new(2.6, 3.6)), Some(Vec2::new(2.0, 2.4545455))); // idk i saw this Noneing during gameplay
+    }
+    {
+        /*
+        ####
+        ##p#
+        #e #
+        ####
+        */
+        let mut g = Grid::new(10, 10, 1.0, 1.0);
+        g.set_2d(2, 2, Tile::Ground);
+        g.set_2d(2, 1, Tile::Ground);
+        g.set_2d(1, 2, Tile::Ground);
+        assert_eq!(g.raycast(Vec2::new(1.5, 2.5), Vec2::new(2.9, 1.9)), None);
+    }
     {
         let mut g = Grid::new(10, 10, 1.0, 1.0);
         for i in 0..10 {
@@ -238,19 +258,12 @@ fn test_raycast() {
                 g.set_2d(i,j, Tile::Ground);
             }
         }
-        println!("asssss");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(3.5, 1.5)), None);
-        println!("ass");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(2.0, 2.0)), None);
-        println!("ass2");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(3.0, 3.0)), None);
-        println!("ass3");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(5.0, 5.0)), None);
-        println!("ass4");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(8.5, 8.5)), None);
-        println!("ass5");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(8.5, 0.5)), None);
-        println!("ass6");
         assert_eq!(g.raycast(Vec2::new(0.5, 0.5), Vec2::new(0.5, 8.5)), None);
 
     }
@@ -261,169 +274,3 @@ fn test_grid() {
     let g = Grid::new(10, 10, 1.0, 1.0);
     assert_eq!(g.get_xy_of_position(Vec2::new(5.5, 6.5)), (5, 6));
 }
-
-/*
-
-// --------------- picking
-
-float intbound(float s, float ds) {
-    if (ds < 0) {
-        return intbound(-s, -ds);
-    } else {
-        if (ds > 0) {
-            s = s - floorf(s);
-        } else {
-            s = s - ceilf(s);
-        }
-        return (1-s)/ds;
-    }
-}
-
-pick_info pick_block(chunk_manager *world, vec3s pos, vec3s facing, float max_distance) {
-    debugf("facing %.2f, %.2f, %.2f\n", facing.x, facing.y, facing.z);
-    debugf("at %.2f, %.2f, %.2f\n", pos.x, pos.y, pos.z);
-
-    pick_info ret = {0};
-    ret.success = true;
-
-    ret.coords = vec3s_to_vec3l(pos);
-
-    int sx = signum(facing.x);
-    int sy = signum(facing.y);
-    int sz = signum(facing.z);
-
-    float tMaxX = intbound(pos.x, facing.x);
-    float tMaxY = intbound(pos.y, facing.y);
-    float tMaxZ = intbound(pos.z, facing.z);
-
-    debugf("initial tmx: %f, tmy: %.2f, tmz: %f\n", tMaxX, tMaxY, tMaxZ);
-    //debugf("sx %d sy %d sz %d\n", sx, sy, sz);
-
-    float accX = 0;
-    float accY = 0;
-    float accZ = 0;
-
-    float tDeltaX = (float)sx / facing.x;
-    float tDeltaY = (float)sy / facing.y;
-    float tDeltaZ = (float)sz / facing.z;
-
-    float max_squared = max_distance*max_distance;
-
-    int n = 0;
-    while (accX*accX + accY*accY + accZ*accZ <= max_squared) {
-        n++;
-        block_tag t = world_get_block(world, spread(ret.coords)).value;
-        debugf("x: %d y: %d z: %d, t: %d\n", ret.coords.x, ret.coords.y, ret.coords.z, t);
-        debugf("x dist: %.3f, y dist: %.3f, z dist: %.3f\n", accX, accY, accZ);
-        //printf("tmx: %.2f, tmy: %.2f, tmz: %.2f\n", tMaxX, tMaxY, tMaxZ);
-        if (t != BLOCK_AIR) {
-            debugf("found block\n");
-            ret.success=true;
-            return ret;
-        }
-
-        if (tMaxX < tMaxY) {
-            if (tMaxX < tMaxZ) {
-                // X min
-                ret.coords.x += sx;
-                accX = tMaxX;
-                tMaxX += tDeltaX;
-                ret.normal_dir = sx < 0 ? DIR_PX : DIR_MX;
-            } else {
-                // Z min
-                ret.coords.z += sz;
-                accZ = tMaxZ;
-                tMaxZ += tDeltaZ;
-                ret.normal_dir = sz < 0 ? DIR_PZ : DIR_MZ;
-            }
-         } else {
-            if (tMaxY < tMaxZ) {
-                // Y min
-                ret.coords.y += sy;
-                accY = tMaxY;
-                tMaxY += tDeltaY;
-                ret.normal_dir = sy < 0 ? DIR_PY : DIR_MY;
-            } else {
-                // Z min (again)
-                ret.coords.z += sz;
-                accZ = tMaxZ;
-                tMaxZ += tDeltaZ;
-                ret.normal_dir = sz < 0 ? DIR_PZ : DIR_MZ;
-
-            }
-        }
-
-    }
-    ret.success = false;
-    debugf("didnt find anything after n iters %d\n", n);
-    //printf("bailed with accx: %.2f, accy: %.2f, accz: %.2f\n", accX, accY, accZ);
-
-    return ret;
-    
-} */
-
-
-/*
-    // returns optionally the point of intersection
-    // so check a clear line of site via looking for none
-    pub fn raycast2(&self, p1: Vec2, p2: Vec2) -> Option<Vec2> {
-        let mut current_pos = p1;
-
-        let this_square_result = self.get_xy_of_position(current_pos);
-        let dest_square_result = self.get_xy_of_position(p2);
-
-        if this_square_result.is_none() || dest_square_result.is_none() { return None; }
-
-        let (mut curr_x, mut curr_y) = this_square_result.unwrap();
-        let (dest_x, dest_y) = dest_square_result.unwrap();
-
-        let v = p2.sub(p1);
-        let ray_dir = v.normalize();
-        
-        loop { // careful of infinite loop
-            if self.get_2d(curr_x, curr_y).unwrap() == Tile::Wall {
-                println!("wall at {:?}", (curr_x, curr_y));
-                return Some(current_pos);
-            }
-            if dest_x == curr_x && dest_y == curr_y {
-                return None; // we casted all the way without hitting a wall
-            }
-            // increment in either direction by whichever is lowest distance remaining
-            let x_distance = if v.x > 0.0 {
-                current_pos.x.ceil() - current_pos.x
-            } else {
-                current_pos.x - current_pos.x.floor()
-            };
-
-            let dx = x_distance / v.normalize().x;
-
-            let y_distance = if v.y > 0.0 {
-                current_pos.y.ceil() - current_pos.y
-            } else {
-                current_pos.y - current_pos.y.floor()
-            };
-
-            let dy = y_distance / v.normalize().y;
-
-
-            // so theres HOW FAR IT HAS TO GO / 
-            // and HOW MUCH IT IS GOING THAT WAY
-
-            printlunwrapn!("dx {:?} dy {:?}", dx, dy);
-            // probably needs to also take into account direction of v
-            if dx < dy {
-                println!("doing dx");
-                current_pos.x += x_distance;
-                current_pos.y += ray_dir.div_scalar(ray_dir.x).mul_scalar(x_distance).y;
-                curr_x += 1;
-            } else {
-                println!("doing dy");
-                current_pos.y += y_distance;
-                current_pos.x += ray_dir.div_scalar(ray_dir.y).mul_scalar(y_distance).x;
-
-                curr_y += 1;
-            }
-        }        
-    }
-
-*/

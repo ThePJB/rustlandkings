@@ -103,11 +103,13 @@ pub fn generate_level_drunk() -> SimulationState {
     for w in walkers[1..].iter() {
         let walker_pos = g.get_rect_2d(w.pos.0, w.pos.1).center();
                                                                         
-        entities.insert(rand::thread_rng().gen(), match rand::thread_rng().gen_range(0..4) {
+        entities.insert(rand::thread_rng().gen(), match rand::thread_rng().gen_range(0..6) {
             0 => {Entity::new_enemy(walker_pos.x, walker_pos.y)}
             1 => {Entity::new_crate(walker_pos.x, walker_pos.y)}
             2 => {Entity::new_retalliator(walker_pos.x, walker_pos.y)}
             3 => {Entity::new_swarmer(walker_pos.x, walker_pos.y)}
+            4 => {Entity::new_sprayer(walker_pos.x, walker_pos.y)}
+            5 => {Entity::new_bigdog(walker_pos.x, walker_pos.y)}
             _ => {panic!("shouldnt happen")},
         });
     }

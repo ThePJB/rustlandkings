@@ -42,6 +42,8 @@ pub enum EntityType {
     Retaliator,
     Enemy,
     Swarmer,
+    Sprayer,
+    Bigdog,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -58,8 +60,7 @@ pub struct Entity {
     pub health: f32,
     pub last_hit: f32, // for iframes etc
 
-    pub cooldown: f32,
-    pub last_shoot: f32,
+    pub speed: f32,
 
     pub melee_damage: f32,
     pub look_direction: Vec2,
@@ -79,11 +80,9 @@ impl Entity {
             last_hit: 0.0,
             variety: EntityType::Player,
             source: 0,
-            cooldown: 0.01,
-            last_shoot: 0.0,
             melee_damage: 0.0,
             look_direction: Vec2::new(1.0, 0.0),
-            //gun: Gun::new_makina(),
+            speed: 0.6,
             gun: Gun::new_burst_rifle(),
         }
     }
@@ -100,11 +99,46 @@ impl Entity {
             last_hit: 0.0,
             variety: EntityType::Enemy,
             source: 0,
-            cooldown: 0.25,
-            last_shoot: 0.0,
             melee_damage: 0.0,
             look_direction: Vec2::new(1.0, 0.0),
             gun: Gun::new_npc_gun(),
+            speed: 0.6,
+        }
+    }
+    pub fn new_sprayer(x: f32, y: f32) -> Entity {
+        Entity {
+            aabb: Rect::new_centered(x, y, 0.07, 0.07),
+            colour: Color::RGB(0, 0, 255),
+            velocity: Vec2::zero(),
+            draw_order: DrawOrder::Front,
+            force: EntityForce::Enemy,
+            collision_group: CollisionGroup::Other,
+            health: 5.0,
+            last_hit: 0.0,
+            variety: EntityType::Sprayer,
+            source: 0,
+            melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            gun: Gun::new_sprayer_gun(),
+            speed: 0.3,
+        }
+    }
+    pub fn new_bigdog(x: f32, y: f32) -> Entity {
+        Entity {
+            aabb: Rect::new_centered(x, y, 0.12, 0.12),
+            colour: Color::RGB(0, 0, 128),
+            velocity: Vec2::zero(),
+            draw_order: DrawOrder::Front,
+            force: EntityForce::Enemy,
+            collision_group: CollisionGroup::Other,
+            health: 10.0,
+            last_hit: 0.0,
+            variety: EntityType::Bigdog,
+            source: 0,
+            melee_damage: 0.0,
+            look_direction: Vec2::new(1.0, 0.0),
+            gun: Gun::new_bigdog_gun(),
+            speed: 0.1,
         }
     }
     
@@ -114,6 +148,8 @@ impl Entity {
         enemy.colour = Color::RGB(128, 0, 0);
         enemy.aabb = Rect::new_centered(x, y, 0.05, 0.05);
         enemy.melee_damage = 5.0;
+        enemy.speed = 0.6;
+        enemy.health = 3.0;
         return enemy;
     }
     
@@ -128,11 +164,10 @@ impl Entity {
             draw_order: DrawOrder::Back, health: 4.0, 
             last_hit: 0.0,
             source: 0,
-            cooldown: 0.5,
-            last_shoot: 0.0,
             melee_damage: 0.0,
             look_direction: Vec2::new(1.0, 0.0),
             gun: Gun::new_pistol(),
+            speed: 0.6,
         }
     }
 
@@ -147,11 +182,10 @@ impl Entity {
             draw_order: DrawOrder::Back, health: 10.0, 
             last_hit: 0.0,
             source: 0,
-            cooldown: 0.5,
-            last_shoot: 0.0,
             melee_damage: 0.0,
             look_direction: Vec2::new(1.0, 0.0),
             gun: Gun::new_pistol(),
+            speed: 0.6,
         }
     }
 
@@ -170,11 +204,10 @@ impl Entity {
             last_hit: 0.0,
             variety: EntityType::Bullet,
             source: source,
-            cooldown: 0.5,
-            last_shoot: 0.0,
-            melee_damage: 0.0,
+            melee_damage: 1.0,
             look_direction: Vec2::new(1.0, 0.0),
             gun: Gun::new_pistol(),
+            speed: 0.6,
         }
     }
 }

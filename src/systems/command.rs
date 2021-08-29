@@ -15,7 +15,7 @@ pub fn apply_command(state: &mut SimulationState, command: Command) {
     match command {
         Command::Walk(walker_id, direction) => {
             if let Some(mut walker) = state.entities.get_mut(&walker_id) {
-                walker.velocity = direction.mul_scalar(0.6);
+                walker.velocity = direction.mul_scalar(walker.speed);
             }
         },
         Command::Look(id, dir) => {

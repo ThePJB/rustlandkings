@@ -66,6 +66,23 @@ impl Gun {
             keep_shooting: false,
         }
     }
+    pub fn new_sprayer_gun() -> Gun {
+        Gun { 
+            damage: 0.5, 
+            spread: 0.2, 
+            speed: 0.7, 
+            num_bullets: 1, 
+            automatic: true, 
+            cooldown: 0.1, 
+            burst: 7, 
+            burst_count: 0,
+            burst_cooldown: 2.0, 
+            ammo: 48,
+            last_fired: 0.0,
+
+            keep_shooting: false,
+        }
+    }
 
     pub fn new_makina() -> Gun {
         Gun { 
@@ -101,7 +118,7 @@ impl Gun {
             burst_count: 0,
             burst_cooldown: 0.33, 
 
-            keep_shooting: false,
+            keep_shooting: true,
         }
     }
 
@@ -138,6 +155,24 @@ impl Gun {
             burst: 2, 
             burst_count: 0,
             burst_cooldown: 1.0, 
+
+            keep_shooting: false,
+        }
+    }
+    pub fn new_bigdog_gun() -> Gun {
+        Gun { 
+            damage: 0.5, 
+            spread: 0.5, 
+            speed: 0.6, 
+            num_bullets: 5, 
+            automatic: true, 
+            cooldown: 0.4, 
+            ammo: 36, 
+            last_fired: 0.0,
+
+            burst: 2, 
+            burst_count: 0,
+            burst_cooldown: 4.0, 
 
             keep_shooting: false,
         }
