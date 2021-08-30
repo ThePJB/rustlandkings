@@ -61,24 +61,35 @@ ultimate pacifism
 
 command pattern going to be good for sounds and shit
 
+-----------------
+
+i should probs play hotline miami
 
 ---- 
 
 Generation
 ----------
 Yeah idk maybe author some maps could be cool
+generation be good tho
 
 Mechanics
 ---------
+add hp
+change melee hit
 Add gun fifo
 add eating guns
-add hp
 
+make stuff that blows up a whole line like bomberman
 
-Enemies
--------
-Sprayer
-    sprayer smg cunt tries to get within his short range to shoot at you
+a lot of the time interesting movt, fast roll move w/ maybe iframes
 
-Bigdog
-    big and slow and tanky, double shotgun
+game where you do all your health damage on impact to the other guy
+rpg with shit combat basically but maybe you can make it strategic lol
+max hp goes up by their hp and you have proportional regen
+its like katamari. you have to get bigger of course
+minimap
+
+level algorithm, make it real big and give chance to spawn cluster
+gun pickups
+
+could make furthest walker from player a boss room

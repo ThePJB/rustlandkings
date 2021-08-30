@@ -97,10 +97,20 @@ pub fn generate_level_drunk() -> SimulationState {
     }
 
     let mut entities = HashMap::new();
-    let player_pos = g.get_rect_2d(walkers[0].pos.0, walkers[0].pos.1).center();
+    
+    let (player_walker_i, player_walker) = walkers.iter()
+        .enumerate()
+        .max_by_key(|(i, w1)| {
+            let x = w1.pos.0 - side_length/2;
+            let y = w1.pos.1 - side_length/2;
+            x*x+y*y
+        }).unwrap();
+
+    let player_pos = g.get_rect_2d(player_walker.pos.0, player_walker.pos.1).center();
     entities.insert(rand::thread_rng().gen(), Entity::new_player(player_pos.x, player_pos.y));
 
-    for w in walkers[1..].iter() {
+    for (i, w) in walkers.iter().enumerate() {
+        if i == player_walker_i {continue};
         let walker_pos = g.get_rect_2d(w.pos.0, w.pos.1).center();
                                                                         
         entities.insert(rand::thread_rng().gen(), match rand::thread_rng().gen_range(0..6) {

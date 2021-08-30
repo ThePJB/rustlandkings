@@ -182,7 +182,7 @@ impl Game {
         }
 
         // draw entities
-        let mut draw_entity = |entity: &Entity, a: f32| {
+        let mut draw_entity = |entity: &Entity| {
             canvas.set_draw_color(entity.colour);
             let screenspace_rect = self.transform.project_rect(entity.aabb);
             let px_rect = self.transform.sdl_rect(screenspace_rect);
@@ -190,8 +190,59 @@ impl Game {
             canvas.fill_rect(px_rect).unwrap();
         };
 
-        self.state.entities.iter().filter(|(_, entity)| entity.draw_order == DrawOrder::Back).for_each(|(_, entity)| draw_entity(entity, self.transform.px.0 as f32/self.transform.px.1 as f32));
-        self.state.entities.iter().filter(|(_, entity)| entity.draw_order == DrawOrder::Front).for_each(|(_, entity)| draw_entity(entity, self.transform.px.0 as f32/self.transform.px.1 as f32));
+        self.state.entities.iter().filter(|(_, entity)| entity.draw_order == DrawOrder::Back).for_each(|(_, entity)| draw_entity(entity));
+        self.state.entities.iter().filter(|(_, entity)| entity.draw_order == DrawOrder::Front).for_each(|(_, entity)| draw_entity(entity));
+
+        // draw hud
+        let player_hp_fraction = match self.state.entities.get(&self.player_id) {
+            Some(player) => {player.health / 5.0},
+            None => 0.0,
+        };
+
+        //let hp_bg_rect = Rect::new_centered(self.transform.aspect_ratio()/2.0, 0.9, 0.5, 0.04);
+        let hp_bg_rect = Rect::new(0.0, 0.65, 0.3, 0.05);
+        let mut hp_fg_rect = hp_bg_rect.dilate(-0.01);
+        hp_fg_rect.w *= player_hp_fraction;
+
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
+        canvas.fill_rect(self.transform.sdl_rect(hp_bg_rect)).unwrap();
+        canvas.set_draw_color(Color::RGB(255, 0, 0));
+        canvas.fill_rect(self.transform.sdl_rect(hp_fg_rect)).unwrap();
+
+
+        // draw minimap
+        let mm_border = Rect::new(0.0, 0.7, 0.3, 0.3);
+        let mm_rect = mm_border.dilate(-0.02);
+
+        let mm_xo = mm_rect.x;
+        let mm_yo = mm_rect.y;
+        let mm_scale = mm_rect.w / self.state.terrain.w as f32;
+
+        canvas.set_draw_color(Color::RGB(0,0,0));
+        canvas.fill_rect(self.transform.sdl_rect(mm_border)).unwrap();
+
+        for (i, t) in self.state.terrain.tiles.iter().enumerate() {
+            let x = i as i32 % self.state.terrain.w;
+            let y = i as i32 / self.state.terrain.w;
+            let r = Rect::new(mm_xo + x as f32 * mm_scale, mm_yo + y as f32 * mm_scale, mm_scale, mm_scale);
+
+            canvas.set_draw_color(match t {
+                &Tile::Ground => {Color::RGB(200, 200, 100)},
+                &Tile::Wall => {Color::RGB(50, 50, 100)},
+            });
+            
+            canvas.fill_rect(self.transform.sdl_rect(r)).unwrap();
+        }
+        if let Some(player) = self.state.entities.get(&self.player_id) {
+            let player_rect = Rect::new_centered(
+                mm_xo + player.aabb.center().x * mm_scale / self.state.terrain.elem_w,
+                mm_yo + player.aabb.center().y * mm_scale / self.state.terrain.elem_w,
+                0.009,
+                0.009,
+            );
+            canvas.set_draw_color(Color::RGB(255, 255, 255));
+            canvas.fill_rect(self.transform.sdl_rect(player_rect)).unwrap();
+        }
     }
 
     pub fn update(&mut self, dt: f64) {

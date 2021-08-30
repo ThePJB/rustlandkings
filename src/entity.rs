@@ -147,7 +147,7 @@ impl Entity {
         enemy.variety = EntityType::Swarmer;
         enemy.colour = Color::RGB(128, 0, 0);
         enemy.aabb = Rect::new_centered(x, y, 0.05, 0.05);
-        enemy.melee_damage = 5.0;
+        enemy.melee_damage = 2.0;
         enemy.speed = 0.6;
         enemy.health = 3.0;
         return enemy;
